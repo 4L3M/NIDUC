@@ -1,9 +1,11 @@
 class Event:
+    """Klasa przechowująca zdarzenia."""
+
     start_time = 0
     packet = []
     duration = 0
-    retranmission = 0
-    check_sum_if_correct = True #True - poprawny, False - niepoprawny
+    retransmission = 0 #licznik retransmiji
+    check_sum_correct = 1  # 0 niepoprawny, 1 poprawny
     id = 0
 
     def __init__(self, packet, start_time, duration):
@@ -11,7 +13,5 @@ class Event:
         self.packet = packet
         self.duration = duration
 
-    # Dla kolejki priorytetowej
-    def __lt__(self, other):
+    def __lt__(self, other): # funkcja wymagana przez kolejke priorytetowa
         return self.start_time < other.start_time
-

@@ -1,64 +1,62 @@
 import random
-
-from DetectionCoding import DetectionCoding
-from CorrectionCoding import CorrectionCoding
+from Coding import Coding
+from NumberGenerator import PseudoRandGenerator
 
 
 class Generator:
 
-    def __init__(self, bits_for_package):
-        self.numb_of_bits = bits_for_package
+    """
+    Klasa zwierająca metody generowania danych.
+    """
+    def __init__(self, number_of_bits_for_a_package):
+        self.num_to_signal = PseudoRandGenerator()
+        self.number_of_bits = number_of_bits_for_a_package
 
-    def split_signal_into_packages(self, signal):
-        """ Dzieli sygnał na paczki o długości self.numb_of_bits
-            signal - sygnał do podzielenia
-            return - lista paczek (tablica)"""
+    def __split_into_packages(self, signal):
+        """
+        Dzieli sygnał na pakiety
+        zwraca listę z pakietami.
+        """
+
         packages = []
-        for i in range(0, len(signal), self.numb_of_bits):
-            package = signal[i : i + self.numb_of_bits]
+        for i in range(0, len(signal), self.number_of_bits):
+            package = signal[i: i + self.number_of_bits]
             packages.append(package)
         return packages
 
+
     def generate_signal(self, length):
-        """ Generuje sygnał o długości length
-            length - długość sygnału
-            return - sygnał (tablica)"""
+        """Generuje randomowy sygnał."""
+
         tab = []
-        for i in range(length):
-            tab.append(random.randint(0, 1))
+        tab = self.num_to_signal.binary_number(length)
         return tab
 
-    def generate_package(self, signal, choose_coding, type = 0):
-        """ Generuje pakiety - dzieli sygnał na paczki i koduje je
-            signal - sygnał do podzielenia i zakodowania
-            choose_coding - wybór kodowania
-            type - typ kodowania
-            return - lista paczek (tablica)"""
-        detectionCoding = DetectionCoding()
-        correctionCoding = CorrectionCoding()
-        packages = self.split_signal_into_packages(signal)
-        """ Bit parzystości """
-        # Kodowanie bitu parzystości
+    def generate_package(self, signal, choose_coding):
+        """Dzieli sygnał na pakiety i dodaje kodowanie. Zwraca ramkę z pakietami. Możliwe kodowania:\n
+        '0' - bit parzystosci,\n
+        '1' - CRC8,\n
+        '2' - CRC16,\n
+        '3' - CRC32."""
+
+        # podziel na n-bitowe pakiety
+        packages = self.__split_into_packages(signal)
+        # dla każdego pakietu dodaj bit parzystości
         if choose_coding == 0:
             for packet in packages:
-                packet.append(detectionCoding.parity_bit(packet))
-        # Kodowanie CRC-8
+                packet.append(Coding.parity_bit(packet))
+                # self.__add_parity_bit(packet)
+        # kodowanie CRC8
         if choose_coding == 1:
             for packet in packages:
-                packet+=detectionCoding.crc_8(packet)
-        # Kodowanie CRC-16
+                packet += Coding.crc_8(packet)
+        # kodowanie CRC16
         if choose_coding == 2:
             for packet in packages:
-                packet+=detectionCoding.crc_16(packet)
-        # Kodowanie CRC-32
+                packet += Coding.crc_16(packet)
         if choose_coding == 3:
             for packet in packages:
-                packet+=detectionCoding.crc_32(packet)
+                packet += Coding.crc_32(packet)
 
-        # Kodowanie Hamminga
-        if type == 1:
-            for i, packet in enumerate(packages):
-                packages[i] = correctionCoding.hamming_encode(packet)
-
-        # Zwraca paczkę z pakietami
+        # zwroc paczkę z pakietami
         return packages

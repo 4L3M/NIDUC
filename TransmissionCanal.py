@@ -3,6 +3,7 @@ import random
 
 
 class TransmissionCanal:
+    """Klasa zawierająca metody symulujące kanał transmisyjny."""
 
     not_free_to = 0.0
     bandwidth = 0
@@ -11,21 +12,18 @@ class TransmissionCanal:
         self.bandwidth = bandwidth
 
     def transmission(self, packet, noise):
-        """ Symuluje transmisję pakietu przez kanał
-            packet - pakiet do przesłania
-            noise - szum w kanale
-            return -  zakłócony pakiet"""
+        """Metoda symulująca przesył danych w kanale transmisyjnym o prawdopodobieństwie przekłamania bitu 'noise'.
+        Zwraca zakłócony sygnał."""
+
         packet = copy.deepcopy(packet)
 
         for i in range(len(packet)):
-            if 1 == random.randint(1,1 / noise):
+            if 1 == random.randint(1, 1 / noise):
                 packet[i] = random.randint(0, 1)
-        return packet # zakłócony pakiet
+        return packet  # zwraca zaburzony lub niezaburzony sygnal
 
     def is_free(self, time):
-        """ Sprawdza czy kanał jest wolny
-            time - czas
-            return - True jeśli kanał jest wolny i może przesłać pakiet, False w przeciwnym wypadku"""
+        """Metoda zwraca True jeśli kanał jest wolny i może przesłać dane."""
         if time > self.not_free_to:
             return True
         else:
