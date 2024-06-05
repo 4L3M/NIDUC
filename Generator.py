@@ -9,15 +9,8 @@ class Generator:
     def __init__(self, bits_for_package):
         self.numb_of_bits = bits_for_package
 
-    def split_signal_into_packages(self, signal):
-        """ Dzieli sygnał na paczki o długości self.numb_of_bits
-            signal - sygnał do podzielenia
-            return - lista paczek (tablica)"""
-        packages = []
-        for i in range(0, len(signal), self.numb_of_bits):
-            package = signal[i : i + self.numb_of_bits]
-            packages.append(package)
-        return packages
+    g1 = [1, 0, 1]
+    g2 = [1, 1, 1]
 
     def generate_signal(self, length):
         """ Generuje sygnał o długości length
@@ -27,6 +20,16 @@ class Generator:
         for i in range(length):
             tab.append(random.randint(0, 1))
         return tab
+
+    def split_signal_into_packages(self, signal):
+        """ Dzieli sygnał na paczki o długości self.numb_of_bits
+            signal - sygnał do podzielenia
+            return - lista paczek (tablica)"""
+        packages = []
+        for i in range(0, len(signal), self.numb_of_bits):
+            package = signal[i: i + self.numb_of_bits]
+            packages.append(package)
+        return packages
 
     def generate_package(self, signal, choose_coding, type = 0):
         """ Generuje pakiety - dzieli sygnał na paczki i koduje je
@@ -56,9 +59,18 @@ class Generator:
                 packet+=detectionCoding.crc_32(packet)
 
         # Kodowanie Hamminga
-        if type == 1:
+        if type == 0:
             for i, packet in enumerate(packages):
                 packages[i] = correctionCoding.hamming_encode(packet)
+        if type == 1:
+            for i, packet in enumerate(packages):
+                packages[i] = correctionCoding.repeat_encode(packet, repeat_factor = 3)
+        if type == 2:
+            for i, packet in enumerate(packages):
+                packages[i] = correctionCoding.bch_encode(packet)
+        if type == 3:
+            for i, packet in enumerate(packages):
+                packages[i] = correctionCoding.convolutional_encoder(packet, self.g1, self.g2)
 
         # Zwraca paczkę z pakietami
         return packages

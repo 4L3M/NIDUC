@@ -1,3 +1,5 @@
+from reedsolo import RSCodec
+
 from DetectionCoding import DetectionCoding
 from CorrectionCoding import CorrectionCoding
 
@@ -9,6 +11,11 @@ class Decoder:
             package - pakiet do odbioru"""
         self.package = package
         detectionCoding = DetectionCoding()
+
+        # Ensure that package is not None
+        if self.package is None:
+            return False
+
         if choose_coding == 0:
             if detectionCoding.parity_bit(self.package[:-1]) == self.package[-1]:
                 return True
@@ -69,3 +76,70 @@ class Decoder:
                 decoded_data.append(encode_data[i - 1])
 
         return decoded_data
+
+    # def decode_tmr(self, encoded_data):
+    #     """
+    #     Dekodowanie danych zakodowanych potrójną redundancją modułową (TMR)
+    #     Używa głosowania większościowego do określenia poprawnej wartości każdego bitu
+    #
+    #     :param encoded_data: String zakodowanych danych binarnych TMR (np. '111000111111')
+    #     :return: Dane zdekodowane jako string
+    #
+    #     """
+    #     if len(encoded_data) % 3 != 0:
+    #         raise ValueError("Encoded data length must be a multiple of 3")
+    #
+    #     decoded_data = []
+    #     for i in range(0, len(encoded_data), 3):
+    #         triplet = encoded_data[i:i + 3]
+    #         bit = '1' if triplet.count('1') > 1 else '0'
+    #         decoded_data.append(bit)
+    #
+    #     return ''.join(decoded_data)
+
+    def hamming_distance(self, seq1, seq2):
+        return sum(el1 != el2 for el1, el2 in zip(seq1, seq2))
+
+    def convolutional_decoder(self, encoded_data, g1, g2):
+        data_bits = []
+        register = [0] * max(len(g1), len(g2))
+        correction = CorrectionCoding()
+
+
+        for i in range(0, len(encoded_data), 2):
+            received_bits = [int(encoded_data[i]), int(encoded_data[i + 1])]
+
+            possible_outputs = [
+                ([0], [0, 0]),
+                ([0], [0, 1]),
+                ([0], [1, 0]),
+                ([0], [1, 1]),
+                ([1], [0, 0]),
+                ([1], [0, 1]),
+                ([1], [1, 0]),
+                ([1], [1, 1])
+            ]
+
+            min_distance = float('inf')
+            best_match = None
+
+            for input_bits, expected_output in possible_outputs:
+              #  register = correction.convolutional_encoder().shift_register(register, input_bits[0])
+
+                register = correction.shift_register(register, input_bits[0])
+                output_bit1 = correction.xor_output(register, g1)
+                output_bit2 = correction.xor_output(register, g2)
+                distance = self.hamming_distance(received_bits, [output_bit1, output_bit2])
+
+                if distance < min_distance:
+                    min_distance = distance
+                    best_match = input_bits[0]
+
+            data_bits.append(best_match)
+
+        return ''.join(map(str, data_bits))
+
+    def bch_decode(self, encode_data):
+        correctionCoding = CorrectionCoding()
+        decoded_data = correctionCoding.bch_decode(encode_data)
+        return decoded_data if decoded_data is not None else encode_data

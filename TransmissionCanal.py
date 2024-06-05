@@ -18,7 +18,7 @@ class TransmissionCanal:
         packet = copy.deepcopy(packet)
 
         for i in range(len(packet)):
-            if 1 == random.randint(1,1 / noise):
+            if 1 == random.randint(1,1 / noise): # zakłócenie pakietu z prawdopodobieństwem 1/noise
                 packet[i] = random.randint(0, 1)
         return packet # zakłócony pakiet
 
