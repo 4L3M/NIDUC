@@ -2,23 +2,19 @@ class DetectionCoding:
     def __init__(self):
         pass
     def parity_bit(self, signal):
-        """
-        Kodowanie bitu parzystości
+        """ Kodowanie bitu parzystości
             signal - sygnał do zakodowania
-            return - zakodowany sygnał
-        """
+            return - zakodowany sygnał"""
         if signal.count(1) % 2 == 0:
             return 0
         else:
             return 1
 
     def string_to_array(self, binary_string, coding):
-        """
-        Zamienia ciąg bitów na tablicę bitów
+        """ Zamienia ciąg bitów na tablicę bitów
             string - ciąg bitów
             coding - kodowanie
-            return - tablica bitów
-        """
+            return - tablica bitów"""
         tab = []
         if(len(binary_string) - 2) % coding != 0:
             for i in range(coding - (len(binary_string) - 2) % coding):

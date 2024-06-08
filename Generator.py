@@ -9,8 +9,6 @@ class Generator:
     def __init__(self, bits_for_package):
         self.numb_of_bits = bits_for_package
 
-    g1 = [1, 0, 1]
-    g2 = [1, 1, 1]
 
     def generate_signal(self, length):
         """ Generuje sygnał o długości length
@@ -58,19 +56,21 @@ class Generator:
             for packet in packages:
                 packet+=detectionCoding.crc_32(packet)
 
+
+#---------Kody korekcyjne ----------------------
+
         # Kodowanie Hamminga
         if type == 0:
             for i, packet in enumerate(packages):
                 packages[i] = correctionCoding.hamming_encode(packet)
+        # Kodowanie BCH
         if type == 1:
             for i, packet in enumerate(packages):
-                packages[i] = correctionCoding.repeat_encode(packet, repeat_factor = 3)
-        if type == 2:
-            for i, packet in enumerate(packages):
                 packages[i] = correctionCoding.bch_encode(packet)
-        if type == 3:
+
+        if type == 2:  # Kodowanie powtórzeń
             for i, packet in enumerate(packages):
-                packages[i] = correctionCoding.convolutional_encoder(packet, self.g1, self.g2)
+                packages[i] = correctionCoding.repeat_encode(packet, 3)
 
         # Zwraca paczkę z pakietami
         return packages
