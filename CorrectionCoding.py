@@ -41,7 +41,7 @@ class CorrectionCoding:
         try:
             bch = bchlib.BCH(t, poly, m, swap_bits)
         except RuntimeError as e:
-            print(f"Error initializing BCH: {e}")
+
             return None
 
         data_bytes = bytes(data)
