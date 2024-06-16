@@ -98,8 +98,6 @@ def simulation(coding, packet_length, num_of_retransmission, signal_length, nois
         event.start_time += delta_time
         events_queue.put(event)
 
-    #root.mainloop()
-
 
     global end_time
     for i in range(len(time)):
@@ -110,68 +108,6 @@ def simulation(coding, packet_length, num_of_retransmission, signal_length, nois
     compare_signals(signal, received_signal)
     return result_queue, redundant_bits, liczba_retransmisji
 
-
-# DZIALA ALE BEZ FEC
-# def tests():
-#     with open('test_results.txt', 'w') as file:
-#         line = "Coding; p_len; retransmisions; s_len; noise; bandwidth; lose [%]; variancja [%]; time [us]; nr; id; lretrans; correct \n"
-#         file.write(line)
-#         for kod in range(4):
-#             coding = kod
-#             for c in range(1):
-#                 num_of_retransmission = 50
-#                 for p in [0.05, 0.1, 0.25, 0.5]:
-#                     packet_length1 = int(signal_length * p)
-#                     for noise in [0.1, 0.05, 0.01]:
-#                         for bandwidth in [1, 10, 100, 1000]:
-#                             lose = 0
-#                             time = 0
-#                             loses = []
-#                             print("TEST", signal_length)
-#                             for i in range(100):
-#                                 lista2 = simulation(coding, packet_length1, num_of_retransmission, signal_length, noise,
-#                                                     bandwidth)
-#                                 print("lista2", lista2)
-#                                 while not lista2.empty():
-#                                     event = lista2.get()
-#                                     line = "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12}\n".format(
-#                                         str(coding),
-#                                         str(packet_length1),
-#                                         str(num_of_retransmission),
-#                                         str(signal_length),
-#                                         str(noise), str(bandwidth),
-#                                         str(round(stat, 2)),
-#                                         0,
-#                                         str(round(end_time, 4)), i,
-#                                         str(event.id),
-#                                         str(event.retransmission),
-#                                         str(event.check_sum_correct))
-#                                     file.write(line)
-#                                 loses.append(stat)
-#                                 lose += stat
-#                                 time += end_time
-#
-#                             squared_diff = [(x - lose / 100) ** 2 for x in loses]
-#                             variance = sum(squared_diff) / len(loses)
-#
-#                             line = "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12}\n".format(str(coding),
-#                                                                                                      str(packet_length1),
-#                                                                                                      str(num_of_retransmission),
-#                                                                                                      str(signal_length),
-#                                                                                                      str(noise),
-#
-#                                                                                                      str(bandwidth),
-#                                                                                                      str(round(
-#                                                                                                          lose / 100,
-#                                                                                                          2)),
-#                                                                                                      str(round(variance,
-#                                                                                                                2)),
-#                                                                                                      str(round(
-#                                                                                                          time / 100,
-#                                                                                                          4)), 1000, 0,
-#                                                                                                      0, 0)
-#                             file.write(line)
-#         file.close()
 
 def tests():
     with open('test_results.txt', 'w') as file:
