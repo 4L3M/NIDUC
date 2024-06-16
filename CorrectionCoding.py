@@ -1,6 +1,5 @@
 import bchlib
-import numpy as np
-from numpy.polynomial import polynomial as poly
+
 
 class CorrectionCoding:
     def hamming_encode(self, data):
@@ -41,7 +40,7 @@ class CorrectionCoding:
         try:
             bch = bchlib.BCH(t, poly, m, swap_bits)
         except RuntimeError as e:
-            print(f"Error initializing BCH: {e}")
+
             return None
 
         data_bytes = bytes(data)

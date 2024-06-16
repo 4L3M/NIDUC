@@ -17,17 +17,13 @@ class TransmissionCanal:
             return -  zakłócony pakiet"""
         packet = copy.deepcopy(packet)
 
-#Zaklocenie pakietu w zaleznosci od wybranego typu zaklocenia
+        #Zaklocenie pakietu w zaleznosci od wybranego typu zaklocenia
         # BER - Bit Error Rate
         if error_type == 'BER':
             for i in range(len(packet)):
-                if random.random() < noise:
-                    packet[i] = 1 if packet[i] == 0 else 0
-        # independent - niezależne zakłócenia
-        elif error_type == 'independent':
-            for i in range(len(packet)):
-                if random.random() < noise:
-                    packet[i] = 1 if packet[i] == 0 else 0
+                if 1 == random.randint(1, (int)(1 / noise)): # zakłócenie pakietu z prawdopodobieństwem 1/noise
+                    packet[i] = random.randint(0, 1)
+
         # burst - zakłócenia grupowe
         elif error_type == 'burst':
             burst_length = int(len(packet) * noise)
@@ -35,11 +31,6 @@ class TransmissionCanal:
             for i in range(burst_start, burst_start + burst_length):
                 packet[i] = 1 if packet[i] == 0 else 0
 
-
-#Podstawowa forma zaklocenia pakietu
-        # for i in range(len(packet)):
-        #     if 1 == random.randint(1,int(1 / noise)): # zakłócenie pakietu z prawdopodobieństwem 1/noise
-        #         packet[i] = random.randint(0, 1)
         return packet # zakłócony pakiet
 
     def is_free(self, time):

@@ -18,19 +18,16 @@ class Decoder:
 
         # CRC-8
         if choose_coding == 1:
-            print("coding: 1")
             if package[-8:] == detectionCoding.crc_8(package[0:-8]):
                 return True
             return False
         # CRC-16
         if choose_coding == 2:
-            print("coding: 2")
             if package[-16:] == detectionCoding.crc_16(package[0:-16]):
                 return True
             return False
         # CRC-32
         if choose_coding == 3:
-            print("coding: 3")
             if package[-32:] == detectionCoding.crc_32(package[0:-32]):
                 return True
             return False
@@ -83,7 +80,6 @@ class Decoder:
         try:
             bch = bchlib.BCH(t, poly, m, swap_bits)
         except RuntimeError as e:
-            print(f"Error initializing BCH: {e}")
             return None
 
         data_bytes = bytes(data)
@@ -91,11 +87,9 @@ class Decoder:
 
         status = bch.decode(data, ecc)
         if status == 0:
-            print(f"BCH Decode Success - Decoded Data: {data}")
             return list(data)
         else:
-            print(f"BCH Decode Failure - Status: {status}")
-            return None
+            return list(data)
 
 
 
