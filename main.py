@@ -226,5 +226,5 @@ if __name__ == '__main__':
     #     wynik += simulation(coding, packet_length, num_of_retransmission, signal_length, noise, bandwidth, type, bits_repetition_numb)
     # print("Wynik: ", wynik / num_of_repetition, "%")
 
-# Testowanie
+# Testowanie symulacji
     tests()
