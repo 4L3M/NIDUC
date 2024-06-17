@@ -25,19 +25,22 @@ class DetectionCoding:
         return tab
 
     def crc_8(self, data):
-        """ Generuje bity CRC-8
-            data - sygnał do zakodowania
-            return - zakodowany sygnał"""
-        crc = 0
-        polynom = 0x8C # 0x07 = x^8 + x^2 + x + 1 wielomian dla crc-8
-        for bit in data:
-            crc ^= bit
-            for i in range(8):
+        """Generuje bity CRC-8
+           data - sygnał do zakodowania (powinien być typu listy/ciągu bajtów)
+           return - zakodowany sygnał"""
+        crc = 0x00  # Inicjalizujemy CRC-8 do 0
+        polynom = 0x07  # Wielomian dla CRC-8
+
+        for byte in data:
+            crc ^= byte  # XOR-owanie bieżącego bajtu z CRC
+            for _ in range(8):  # Przetwarzanie każdego bitu
                 if crc & 0x80:
-                    crc = (crc >> 1) ^ polynom
+                    crc = (crc << 1) ^ polynom
                 else:
-                    crc >>= 1
-        return self.string_to_array(bin(crc & 0xFF), 8)
+                    crc <<= 1
+                crc &= 0xFF  # Utrzymanie 8-bitowego CRC
+
+        return self.string_to_array(bin(crc), 8)
 
     def crc_16(self, data):
         """ Generuje bity CRC-16

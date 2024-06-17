@@ -1,7 +1,5 @@
 from queue import PriorityQueue
 import random
-import tkinter as tk
-
 from Decoder import Decoder
 from Event import Event
 from Generator import Generator
@@ -18,36 +16,26 @@ def compare_signals(signal_in, signal_out):
         if signal_in[i] != signal_out[i]:
             lost += 1
     global stat, temp
-    # print("Sygnał wejściowy: ", signal_in)
-    # print("Sygnał wyjściowy: ", signal_out)
+    print("Sygnał wejściowy: ", signal_in)
+    print("Sygnał wyjściowy: ", signal_out)
 
     stat = lost / len(signal_in)
     stat = round(stat * 100, 2)
-    temp += stat
+    print("Procent błędów: ", stat, "%")
 
-    return stat             # zwraca procent błędów BER
+    return stat
 
 
 def simulation(coding, packet_length, num_of_retransmission, signal_length, noise, bandwith, type=0,
                bits_repetition_numb=0):
-
-    ####
-    # root = tk.Tk()
-    # root.title("Packet Transmission Simulation")
-    # canvas = tk.Canvas(root, width=1400, height=600)
-    # canvas.pack()
-    ####
     result_queue = PriorityQueue()
     generator = Generator(packet_length)
     decoder = Decoder()
-    # encoder = CorrectionCoding()
     time = []
     events_queue = PriorityQueue()
     current_time = 0.5
     delta_time = 0.5
     liczba_retransmisji = 0
-    numb_of_packages = signal_length / packet_length
-
     signal = generator.generate_signal(signal_length)
     received_signal = []
 
@@ -129,131 +117,93 @@ def simulation(coding, packet_length, num_of_retransmission, signal_length, nois
 
 
 def tests():
+    signal_length = 1000
     with open('test_results.txt', 'w') as file:
-        line = "Coding; CodingFEC; p_len; retransmisions; s_len; extra bits; noise; bandwidth; lose [%]; variancja [%]; time [us] \n"
+        line = "Coding; CodingFEC; p_len; retransmisions; s_len; extra bits; noise; bandwidth; lose [%]; variancja [%]; time [us];retransmission \n"
         file.write(line)
-        for coding_fec in range(3):
-            type = coding_fec
-            for kod in range(4):
-                coding = kod
-                num_of_retransmission = 10
-                for p in [0.05, 0.1, 0.25, 0.5]:
-                    packet_length1 = int(signal_length * p)
-                    for noise in [0.3, 0.2, 0.1]:
-                        for bandwidth in [1, 10, 100, 1000]:
-                            lose = 0
-                            time = 0
-                            loses = []
-                            liczba_retransmisji = 0
-                            for i in range(20):
-                                lista2, extra_bits, liczba_retransmisji = simulation(coding, packet_length1, num_of_retransmission, signal_length, noise, bandwidth, type, 3)
+        for num_of_retransmission in [5, 25, 125]:
+            for coding_fec in range(3):
+                type = coding_fec
+                for kod in range(4):
+                    coding = kod
+
+                    for p in [0.05, 0.1, 0.25, 0.5]:
+                        packet_length1 = int(signal_length * p)
+                        for noise in [0.3, 0.2, 0.1]:
+                            for bandwidth in [1, 10, 100, 1000]:
+                                lose = 0
+                                time = 0
+                                loses = []
+                                liczba_retransmisji = 0
+                                for i in range(20):
+                                    lista2, extra_bits, liczba_retransmisji = simulation(coding, packet_length1, num_of_retransmission, signal_length, noise, bandwidth, type, 3)
 
 
-                                id = 0
-                                while not lista2.empty():
-                                    event = lista2.get()
-                                    line = "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10}\n".format(
-                                        str(coding),
-                                        str(type),
-                                        str(packet_length1),
-                                        str(liczba_retransmisji),
-                                        str(signal_length),
-                                        str(extra_bits),
-                                        str(noise), str(bandwidth),
-                                        str(round(stat, 2)),
-                                        0,
-                                        str(round(end_time, 4)), i,
-                                        str(event.id),
-                                        str(event.retransmission),
-                                        str(event.check_sum_correct))
-                                    #file.write(line)
-                                loses.append(stat)
-                                lose += stat
-                                time += end_time
+                                    id = 0
+                                    while not lista2.empty():
+                                        event = lista2.get()
+                                        line = "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10}\n".format(
+                                            str(coding),
+                                            str(type),
+                                            str(packet_length1),
+                                            str(liczba_retransmisji),
+                                            str(signal_length),
+                                            str(extra_bits),
+                                            str(noise), str(bandwidth),
+                                            str(round(stat, 2)),
+                                            0,
+                                            str(round(end_time, 4)), i,
+                                            str(event.id),
+                                            str(event.retransmission),
+                                            str(event.check_sum_correct))
+                                        #file.write(line)
+                                    loses.append(stat)
+                                    lose += stat
+                                    time += end_time
 
-                            squared_diff = [(x - lose / 100) ** 2 for x in loses]
-                            variance = sum(squared_diff) / len(loses)
-                            var = liczba_retransmisji / 20  #srednia liczba retransmisji
+                                squared_diff = [(x - lose / 100) ** 2 for x in loses]
+                                variance = sum(squared_diff) / len(loses)
+                                var = liczba_retransmisji / 20  #srednia liczba retransmisji
 
 
-                            line = "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10}\n".format(
-                                str(coding),
-                                str(type),
-                                str(packet_length1),
-                                str(var),
-                                str(signal_length),
-                                str(extra_bits),
-                                str(noise),
+                                line = "{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11}\n".format(
+                                    str(coding),
+                                    str(type),
+                                    str(packet_length1),
+                                    str(var),
+                                    str(signal_length),
+                                    str(extra_bits),
+                                    str(noise),
 
-                                str(bandwidth),
-                                str(round(
-                                    lose / 100,
-                                    2)),
-                                str(round(variance,
-                                          2)),
-                                str(round(
-                                    time / 100,
-                                    4)), 1000, 0,
-                                0, 0)
-                            file.write(line)
+                                    str(bandwidth),
+                                    str(round(
+                                        lose / 100,
+                                        2)),
+                                    str(round(variance,
+                                              2)),
+                                    str(round(
+                                        time / 100,
+                                        4)), num_of_retransmission, 1000, 0,
+                                    0, 0)
+                                file.write(line)
         file.close()
 
 
-def distribution_tests():
-    with open('test_results.csv', 'w') as file:
-        line = "Coding; straty[%]; czas[us];\n"
-        file.write(line)
-        for i in range(4):
-            for j in range(100):
-                simulation(i, packet_length, num_of_retransmission, signal_length, noise, bandwidth)
-                line = "{0}; {1}; {2};\n".format(str(i), str(stat), str(end_time))
-                file.write(line)
-        file.close()
+def menu():
+    coding = input("Wybierz kodowanie: 0 - bit parzystości, 1 - CRC-8, 2 - CRC-16, 3 - CRC-32: ")
+    type = input("Wybierz kodowanie korekcyjne: 0 - Hamming, 1 - repeat, 2 - BCH: ")
+    if type == 1:
+        bits_repetition_numb = input("Podaj liczbę powtórzeń bitów: ")
+    else:
+        bits_repetition_numb = 0
+    packet_length = input("Podaj długość pakietu: ")
+    num_of_retransmission = input("Podaj liczbę możliwych retransmisji: ")
+    signal_length = input("Podaj długość sygnału: ")
+    noise = 0.2
+    bandwidth = input("Podaj szerokość pasma: ")
 
-
-
-
-
-
-
+    simulation(int(coding), int(packet_length), int(num_of_retransmission), int(signal_length), noise,
+               int(bandwidth), int(type), int(bits_repetition_numb))
 if __name__ == '__main__':
-    # Typ kodowania 0 - bit parzystości, 1 - CRC-8, 2 - CRC-16, 3 - CRC-32
-    coding = 0
-    # Typ kodowania korekcyjnego 0 - Hamming, 1 - repeat, 2 - BCH
-    type = 0
-    # Powtorzenia bitów
-    bits_repetition_numb = 3
-    # Długość pakietu
-    packet_length = 50
-    # Liczba możliwych retransmisji
-    num_of_retransmission = 1
-    # Długość sygnału
-    signal_length = 100
-    # Szum w kanale - % na zakłócenie pojedynczej paczki np 0.2 = 20%
-    noise = 0.1
-    # Szerokość pasma w Mb
-    bandwidth = 1000
-    # Liczba powtórzeń symulacji
-    num_of_repetition = 1
-    temp = 0
-    # for c in range(4):
-    #     print(c)
-    #     for(i) in range(num_of_repetition):
-    #         simulation(c, packet_length, num_of_retransmission, signal_length, noise, bandwidth, 0, bits_repetition_numb)
-    #     print("Wynik: ", temp / num_of_repetition, "%")
-    #     temp = 0
-    #     for (i) in range(num_of_repetition):
-    #         simulation(c, packet_length, num_of_retransmission, signal_length, noise, bandwidth, 1, bits_repetition_numb)
-    #     print("Wynik: ", temp / num_of_repetition, "%")
-    #     temp = 0
-    #     for (i) in range(num_of_repetition):
-    #         simulation(c, packet_length, num_of_retransmission, signal_length, noise, bandwidth, 2, bits_repetition_numb)
-    #     print("Wynik: ", temp / num_of_repetition, "%")
-
-    # Srednia z wynikow
-    # for i in range(num_of_repetition):
-    #     wynik += simulation(coding, packet_length, num_of_retransmission, signal_length, noise, bandwidth, type, bits_repetition_numb)
-    # print("Wynik: ", wynik / num_of_repetition, "%")
-
-# Testowanie symulacji
-    tests()
+    menu()
+    #tests()
